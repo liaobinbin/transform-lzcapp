@@ -1,21 +1,12 @@
 FROM node:16-bookworm AS base
 
-FROM base AS deps
-
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-COPY package.json yarn.lock* ./
-RUN yarn
-
 FROM base AS builder
 
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
+RUN yarn
 RUN yarn run build
 
 FROM base AS runner
